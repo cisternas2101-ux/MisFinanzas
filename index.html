@@ -50,16 +50,15 @@ const BILLS = [
   { key:"internet",label:"Internet",      icon:"📡", color:"#9B59B6", tip:"Compara planes cada año para mejores tarifas." },
   { key:"celular", label:"Teléfono celular",icon:"📱",color:"#00D4AA", tip:"Evalúa planes prepago si consumes poco." },
   { key:"Tarjeta de Crédito", label:"Tarjeta de Crédito",icon:"💳",color:"#4A9EFF", tip:"Junta dinero y evita el uso de la tarjeta." },
+  { key:"arriendo",     label:"Arriendo/Dividendo de Vivienda", icon:"🏠", color:"#FF5C6A", tip:"Paga el dividendo o arriendo en los plazos para evitar interés." },
 ];
 
 // Otros gastos del hogar
 const OTHER_CATS = [
   { key:"alimentacion", label:"Alimentación", icon:"🛒", color:"#00E676" },
   { key:"transporte",   label:"Transporte",   icon:"🚌", color:"#4A9EFF" },
-  { key:"arriendo",     label:"Arriendo/Dividendo de Vivienda", icon:"🏠", color:"#FF5C6A" },
   { key:"salud",        label:"Salud",        icon:"💊", color:"#9B59B6" },
   { key:"entretencion", label:"Entretención/deporte", icon:"🎮🏋️‍♂️", color:"#FFB347" },
-  { key:"Tarjeta de crédito", label:"Tarjeta de crédito", icon:"💳", color:"#FFB347" },
   { key:"otros",        label:"Otros",        icon:"📦", color:"#6B82A0" },
 ];
 
@@ -269,8 +268,9 @@ function HomeScreen({ data, onEdit }) {
     ...BILLS.map(b=>({ cat:b.icon, real:data.bills[b.key]||0, tipo:"cuenta" })),
     { cat:"🐷", real:data.savingsAmt, tipo:"ahorro" },
     { cat:"🛒", real:data.others.alimentacion||0, tipo:"otro" },
-    { cat:"🏠", real:data.others.arriendo||0, tipo:"otro" },
-    { cat:"💳", real:data.others.tarjetadecrédito ||0, tipo:"otro" },
+    { cat:"🏠", real:data.others.arriendo||0, tipo:"cuenta" },
+    { cat:"💳", real:data.others.tarjetadecrédito ||0, tipo:"cuenta" },
+    
   ].filter(d=>d.real>0);
   return (
     <div style={S.px}>
