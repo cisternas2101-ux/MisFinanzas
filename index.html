@@ -728,7 +728,7 @@ function App() {
           {screen==="tips"    && <TipsScreen    data={data}/>}
           {screen==="ai"      && <AIScreen      data={data}/>} 
         </div>
-        <Nav active={screen} onTab={setScreen}/>
+        <BottomNav active={screen} setActive={setScreen}/>
       </div>
     </div>
   );
