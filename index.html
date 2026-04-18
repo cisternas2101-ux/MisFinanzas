@@ -708,7 +708,6 @@ function BottomNav({ active, setActive }) {
   const tabs = [
     { id:"home",   icon:"🏠", label:"Inicio" },
     { id:"bills",  icon:"🧾", label:"Cuentas" },
-    { id:"ants",   icon:"🐜", label:"Hormiga" }, 
     { id:"savings",icon:"🐷", label:"Ahorro" },
     { id:"tips",   icon:"💡", label:"Guía" },
     { id:"ai",     icon:"🤖", label:"IA" },
@@ -744,10 +743,7 @@ function App() {
           {screen==="bills"   && <BillsScreen   data={data} setData={setData}/>}
           {screen==="savings" && <SavingsScreen data={data} setData={setData}/>}
           {screen==="tips"    && <TipsScreen    data={data}/>}
-          {screen==="ai"      && <AIScreen      data={data}/>}
-          {/* Nueva pantalla de Gastos Hormiga */}
-          {screen==="ants"    && <AntScreen     data={data} setData={setData}/>}
-           
+          {screen==="ai"      && <AIScreen      data={data}/>} 
         </div>
         <Nav active={screen} onTab={setScreen}/>
       </div>
