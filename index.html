@@ -240,8 +240,8 @@ function SetupWizard({ onFinish }) {
           </div>
           <div style={{ display:"flex", gap:8 }}>
             <button onClick={()=>setStep(3)} style={{ ...S.btnSm, flex:1 }}>← Atrás</button>
-            <button onClick={()=>onFinish({ income, bills, others, savingsGoal, savingsAmt })} style={{ ...S.btn, flex:2 }}>Comenzar 🚀</button>
-          <button onClick={() => onFinish({ income, bills, others, savingsGoal, savingsAmt, antExpenses: [] })} style={{ ...S.btn, flex:2 }}>Comenzar 🚀</button>
+            <button onClick={() => onFinish({ income, bills, others, savingsGoal, savingsAmt, antExpenses: [] })} style={{ ...S.btn, flex:2 }}>Comenzar 🚀</button>
+          
           </div>
         </div>
       )}
