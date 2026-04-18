@@ -240,7 +240,7 @@ function SetupWizard({ onFinish }) {
           </div>
           <div style={{ display:"flex", gap:8 }}>
             <button onClick={()=>setStep(3)} style={{ ...S.btnSm, flex:1 }}>← Atrás</button>
-            <button onClick={() => onFinish({ income, bills, others, savingsGoal, savingsAmt })} style={{ ...S.btn, flex:2 }}>Comenzar 🚀</button>
+           <button onClick={()=>onFinish({ income, bills, others, savingsGoal, savingsAmt })} style={{ ...S.btn, flex:2 }}>Comenzar 🚀</button>
           </div>
         </div>
       )}
@@ -580,22 +580,6 @@ function TipsScreen({ data }) {
 
 // ─── IA ASESOR ───────────────────────────────────────────────────────────────
 function AIScreen({ data }) {
-  const [msgs, setMsgs] = useState([{ role: "assistant", content: "¡Hola! Soy tu asistente FinZen. ¿En qué puedo ayudarte hoy?" }]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const totalBills = Object.values(data.bills).reduce((a, b) => a + b, 0);
-  const totalOthers = Object.values(data.others).reduce((a, b) => a + b, 0);
-
-  // --- COPIA ESTAS 3 LÍNEAS DEBAJO DE LAS ANTERIORES ---
-  const totalAnt = (data.antExpenses || []).reduce((a, b) => a + b.amount, 0);
-  const totalExp = totalBills + totalOthers + data.savingsAmt + totalAnt;
-  const surplus = data.income - totalExp;
-  // ----------------------------------------------------
-
-  const send = () => {
-    // ... aquí va el código de la función send que pusiste al principio ...
-    
   const [msgs, setMsgs] = useState([{ 
     role: "assistant", 
     content: "¡Hola! Soy tu asesor FinZen 💚\n\nHe analizado tus datos: luz, agua, transporte y metas de ahorro. ¿En qué área te gustaría profundizar hoy?" 
@@ -702,7 +686,6 @@ function AIScreen({ data }) {
     </div>
   );
 }
-
 // ─── NAV ──────────────────────────────────────────────────────────────────────
 function BottomNav({ active, setActive }) {
   const tabs = [
