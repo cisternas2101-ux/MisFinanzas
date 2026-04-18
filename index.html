@@ -330,7 +330,6 @@ function HomeScreen({ data, onEdit }) {
         <div style={S.h2}>🧾 Cuentas del mes</div>
         {BILLS.map(b=>{
           const val = data.bills[b.key]||0;
-          const OTHER_CATS= data.OTHER_CATS[b.key]||0;
           if(!val) return null;
           return (
             <div key={b.key} style={{ ...S.row, padding:"8px 0", borderBottom:`1px solid ${C.border}` }}>
