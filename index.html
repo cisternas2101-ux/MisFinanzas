@@ -103,7 +103,7 @@ function SetupWizard({ onFinish }) {
   const [income, setIncome] = useState(0);
   const [savingsGoal, setSavingsGoal] = useState(10);
   const [bills, setBills] = useState({ luz:0, agua:0, internet:0, celular:0 });
-  const [others, setOthers] = useState({ alimentacion:0, transporte:0, arriendo:0, salud:0, entretencion:0, otros:0 });
+  const [others, setOthers] = useState({ alimentacion:0, transporte:0, arriendo:0, salud:0, entretencion:0,Tarjetadecrédito:0, otros:0 });
   const totalBills = Object.values(bills).reduce((a,b)=>a+b,0);
   const totalOthers = Object.values(others).reduce((a,b)=>a+b,0);
   const savingsAmt = Math.round(income * savingsGoal/100);
