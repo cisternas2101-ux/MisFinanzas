@@ -270,6 +270,7 @@ function HomeScreen({ data, onEdit }) {
     { cat:"🐷", real:data.savingsAmt, tipo:"ahorro" },
     { cat:"🛒", real:data.others.alimentacion||0, tipo:"otro" },
     { cat:"🏠", real:data.others.arriendo||0, tipo:"otro" },
+    { cat:"💳", real:data.others.tarjetadecrédito ||0, tipo:"otro" },
   ].filter(d=>d.real>0);
   return (
     <div style={S.px}>
