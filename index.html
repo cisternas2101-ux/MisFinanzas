@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FinZen Personal 💚</title>
+  <title>Edu_FinazasPersonal 💚</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -55,9 +55,9 @@ const BILLS = [
 const OTHER_CATS = [
   { key:"alimentacion", label:"Alimentación", icon:"🛒", color:"#00E676" },
   { key:"transporte",   label:"Transporte",   icon:"🚌", color:"#4A9EFF" },
-  { key:"arriendo",     label:"Arriendo/Vivienda", icon:"🏠", color:"#FF5C6A" },
+  { key:"arriendo",     label:"Arriendo/Dividendo de Vivienda", icon:"🏠", color:"#FF5C6A" },
   { key:"salud",        label:"Salud",        icon:"💊", color:"#9B59B6" },
-  { key:"entretencion", label:"Entretención", icon:"🎮", color:"#FFB347" },
+  { key:"entretencion", label:"Entretención/deporte", icon:"🎮🏋️‍♂️", color:"#FFB347" },
   { key:"Tarjeta de crédito", label:"Tarjeta de crédito", icon:"💳", color:"#FFB347" },
   { key:"otros",        label:"Otros",        icon:"📦", color:"#6B82A0" },
 ];
@@ -692,6 +692,7 @@ function BottomNav({ active, setActive }) {
   const tabs = [
     { id:"home",   icon:"🏠", label:"Inicio" },
     { id:"bills",  icon:"🧾", label:"Cuentas" },
+    { id:"ants",   icon:"🐜", label:"Hormiga" }, 
     { id:"savings",icon:"🐷", label:"Ahorro" },
     { id:"tips",   icon:"💡", label:"Guía" },
     { id:"ai",     icon:"🤖", label:"IA" },
@@ -713,22 +714,32 @@ function BottomNav({ active, setActive }) {
 function App() {
   const [data, setData] = useState(null);
   const [screen, setScreen] = useState("home");
+
+  // El cambio ocurre aquí abajo, en el SetupWizard
   if(!data) return (
     <div style={S.app}><div style={S.phone}><div style={S.screen}>
-      <SetupWizard onFinish={d=>{ setData(d); setScreen("home"); }}/>
+      <SetupWizard onFinish={d => { 
+        // Agregamos antExpenses vacío a los datos que vienen del asistente
+        setData({ ...d, antExpenses: [] }); 
+        setScreen("home"); 
+      }}/>
     </div></div></div>
   );
+
   return (
     <div style={S.app}>
       <div style={S.phone}>
         <div style={S.screen}>
+          {/* Aquí irán tus pantallas */}
           {screen==="home"    && <HomeScreen    data={data} onEdit={()=>setData(null)}/>}
           {screen==="bills"   && <BillsScreen   data={data} setData={setData}/>}
           {screen==="savings" && <SavingsScreen data={data} setData={setData}/>}
           {screen==="tips"    && <TipsScreen    data={data}/>}
           {screen==="ai"      && <AIScreen      data={data}/>}
+          {/* Nueva pantalla de Gastos Hormiga */}
+          {screen==="ants"    && <AntScreen     data={data} setData={setData}/>}
         </div>
-        <BottomNav active={screen} setActive={setScreen}/>
+        <Nav active={screen} onTab={setScreen}/>
       </div>
     </div>
   );
