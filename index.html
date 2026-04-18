@@ -581,7 +581,6 @@ function TipsScreen({ data }) {
 
 // ─── IA ASESOR ───────────────────────────────────────────────────────────────
 function AIScreen({ data }) {
-  function AIScreen({ data }) {
   const [msgs, setMsgs] = useState([{ role: "assistant", content: "¡Hola! Soy tu asistente FinZen. ¿En qué puedo ayudarte hoy?" }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -756,7 +755,7 @@ function App() {
           {screen==="ai"      && <AIScreen      data={data}/>}
           {/* Nueva pantalla de Gastos Hormiga */}
           {screen==="ants"    && <AntScreen     data={data} setData={setData}/>}
-          
+           
         </div>
         <Nav active={screen} onTab={setScreen}/>
       </div>
