@@ -51,15 +51,16 @@ const BILLS = [
   { key:"celular", label:"Teléfono celular",icon:"📱",color:"#00D4AA", tip:"Evalúa planes prepago si consumes poco." },
   { key:"Tarjeta de Crédito", label:"Tarjeta de Crédito",icon:"💳",color:"#4A9EFF", tip:"Junta dinero y evita el uso de la tarjeta." },
   { key:"arriendo",     label:"Arriendo/Dividendo de Vivienda", icon:"🏠", color:"#FF5C6A", tip:"Paga el dividendo o arriendo en los plazos para evitar interés." },
+  { key:"alimentacion", label:"Alimentación", icon:"🛒", color:"#00E676", tip:"Compra en lugares mayorista, ocupa puntos para obtener descuentos."  },
+  { key:"entretencion", label:"Entretención/deporte", icon:"🎮🏋️‍♂️", color:"#FFB347" , tip:"Invierte en deporte para tu vejez."},
 ];
 
 // Otros gastos del hogar
 const OTHER_CATS = [
-  { key:"alimentacion", label:"Alimentación", icon:"🛒", color:"#00E676" },
+ 
   { key:"transporte",   label:"Transporte",   icon:"🚌", color:"#4A9EFF" },
   { key:"salud",        label:"Salud",        icon:"💊", color:"#9B59B6" },
-  { key:"entretencion", label:"Entretención/deporte", icon:"🎮🏋️‍♂️", color:"#FFB347" },
-  { key:"otros",        label:"Otros",        icon:"📦", color:"#6B82A0" },
+   { key:"otros",        label:"Otros",        icon:"📦", color:"#6B82A0" },
 ];
 
 const ALL_CATS = [...BILLS.map(b=>({ ...b, isBill:true })), ...OTHER_CATS];
@@ -270,7 +271,7 @@ function HomeScreen({ data, onEdit }) {
     { cat:"🛒", real:data.others.alimentacion||0, tipo:"otro" },
     { cat:"🏠", real:data.others.arriendo||0, tipo:"cuenta" },
     { cat:"💳", real:data.others.tarjetadecrédito ||0, tipo:"cuenta" },
-    
+    { cat:"🎮🏋️‍♂️", real:data.others.entretencion ||0, tipo:"cuenta" },
   ].filter(d=>d.real>0);
   return (
     <div style={S.px}>
