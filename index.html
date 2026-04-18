@@ -580,112 +580,66 @@ function TipsScreen({ data }) {
 
 // ─── IA ASESOR ───────────────────────────────────────────────────────────────
 function AIScreen({ data }) {
-  const [msgs, setMsgs] = useState([{ 
-    role: "assistant", 
-    content: "¡Hola! Soy tu asesor FinZen 💚\n\nHe analizado tus datos: luz, agua, transporte y metas de ahorro. ¿En qué área te gustaría profundizar hoy?" 
-  }]);
+  const [msgs, setMsgs] = useState([{ role:"assistant", content:"¡Hola! Soy tu asesor FinZen 💚\n\nYa cargué toda tu información: tus cuentas de luz, agua, internet, celular, tus gastos y tu meta de ahorro.\n\n¿Qué quieres mejorar hoy?" }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const ref = useRef(null);
-
-  // Cálculos rápidos para el análisis
-  const totalBills = Object.values(data.bills).reduce((a, b) => a + b, 0);
-  const totalOthers = Object.values(data.others).reduce((a, b) => a + b, 0);
-  const totalExp = totalBills + totalOthers + data.savingsAmt;
-  const surplus = data.income - totalExp;
-
-  useEffect(() => { ref.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, loading]);
-
-  const send = () => {
-    if (!input.trim() || loading) return;
-    const msg = input.trim();
-    const query = msg.toLowerCase();
-    
-    setInput("");
-    setMsgs(p => [...p, { role: "user", content: msg }]);
-    setLoading(true);
-
-    // Simulamos un pequeño tiempo de "pensamiento" de la IA
-    setTimeout(() => {
-      let response = "";
-
-      // LÓGICA DE ANÁLISIS DE DATOS
-      if (query.includes("luz") || query.includes("electricidad")) {
-        const pct = ((data.bills.luz / data.income) * 100).toFixed(1);
-        response = `Tu cuenta de luz es de ${CLP(data.bills.luz)}. Esto representa un ${pct}% de tu sueldo. 💡 Acción: Revisa el sello de tus ventanas; el aire filtrado hace que gastes más en calefacción o aire acondicionado.`;
-      } 
-      else if (query.includes("ahorro") || query.includes("ahorrar")) {
-        response = `Actualmente estás ahorrando el ${data.savingsGoal}% (${CLP(data.savingsAmt)}). 📈 Acción: Si logras reducir un 10% tus "Otros Gastos", podrías subir tu ahorro a ${CLP(data.savingsAmt + (totalOthers * 0.1))} mensual.`;
-      }
-      else if (query.includes("gastos") || query.includes("bien") || query.includes("analiza")) {
-        if (surplus > 0) {
-          response = `¡Vas por buen camino! Después de todos tus gastos y ahorros, te quedan ${CLP(surplus)} libres. 💳 Acción: No gastes ese excedente hoy; ponlo en una cuenta de interés diario para que crezca.`;
-        } else {
-          response = `Atención: Tus gastos están muy ajustados a tus ingresos. ⚠️ Acción: Revisa el item de '${Object.keys(data.others).sort((a,b)=>data.others[b]-data.others[a])[0]}', es tu gasto más alto fuera de las cuentas fijas.`;
-        }
-      }
-      else if (query.includes("comida") || query.includes("alimentación")) {
-        response = `Gastas ${CLP(data.others.alimentacion)} en alimentación. 🛒 Acción: Intenta hacer 'meal prep' los domingos para evitar comprar comida rápida durante la semana laboral.`;
-      }
-      else {
-        response = "Interesante pregunta. Basado en tu perfil, lo mejor es enfocarte en optimizar tus gastos variables. ¿Quieres que analicemos tu meta de ahorro o tus cuentas básicas?";
-      }
-
-      setMsgs(p => [...p, { role: "assistant", content: response }]);
-      setLoading(false);
-    }, 800);
+  const totalBills = Object.values(data.bills).reduce((a,b)=>a+b,0);
+  const totalOthers = Object.values(data.others).reduce((a,b)=>a+b,0);
+  const totalExp = totalBills+totalOthers+data.savingsAmt;
+  const ctx = `Perfil financiero: Ingreso mensual ${CLP(data.income)}. Cuentas del hogar: luz ${CLP(data.bills.luz||0)}, agua ${CLP(data.bills.agua||0)}, internet ${CLP(data.bills.internet||0)}, celular ${CLP(data.bills.celular||0)}, total cuentas ${CLP(totalBills)}. Otros gastos: alimentación ${CLP(data.others.alimentacion||0)}, transporte ${CLP(data.others.transporte||0)}, arriendo ${CLP(data.others.arriendo||0)}, salud ${CLP(data.others.salud||0)}, entretención ${CLP(data.others.entretencion||0)}. Total gastos ${CLP(totalExp)}. Ahorro mensual: ${data.savingsGoal}% = ${CLP(data.savingsAmt)}. Dinero libre: ${CLP(data.income-totalExp)}.`;
+  useEffect(()=>{ ref.current?.scrollIntoView({ behavior:"smooth" }); },[msgs,loading]);
+  const send = async () => {
+    if(!input.trim()||loading) return;
+    const msg = input.trim(); setInput("");
+    setMsgs(p=>[...p,{ role:"user", content:msg }]); setLoading(true);
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST", headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000,
+          system:`Eres FinZen, asesor financiero personal en español chileno. ${ctx} Responde de forma concisa (máx 160 palabras), práctica y amigable. Siempre termina con 1 acción concreta que pueda hacer HOY. Usa emojis con moderación.`,
+          messages:[...msgs,{ role:"user", content:msg }] }),
+      });
+      const r = await res.json();
+      setMsgs(p=>[...p,{ role:"assistant", content:r.content?.[0]?.text||"Error al obtener respuesta." }]);
+    } catch { setMsgs(p=>[...p,{ role:"assistant", content:"Error de conexión. Intenta nuevamente." }]); }
+    finally { setLoading(false); }
   };
-
-  const quick = ["¿Cómo bajo mi cuenta de luz?", "¿Cómo ahorro más?", "¿Estoy bien con mis gastos?", "Analiza mi alimentación"];
-
+  const quick = ["¿Cómo bajo mi cuenta de luz?","¿Cómo ahorro más este mes?","Ideas para ganar más dinero","¿Estoy bien con mis gastos?","Crea un plan de ahorro"];
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 90px)", paddingTop: 12 }}>
-      <div style={{ ...S.px, paddingBottom: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 42, height: 42, borderRadius: 12, background: C.teal + "22", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>🤖</div>
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 700 }}>FinZen IA Local</div>
-            <div style={{ fontSize: 11, color: C.teal }}>● Análisis de datos activo</div>
-          </div>
+    <div style={{ display:"flex", flexDirection:"column", height:"calc(100vh - 90px)", paddingTop:12 }}>
+      <div style={{ ...S.px, paddingBottom:10 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ width:42, height:42, borderRadius:12, background:C.teal+"22", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>🤖</div>
+          <div><div style={{ fontSize:15, fontWeight:700 }}>FinZen IA</div><div style={{ fontSize:11, color:C.teal }}>● Asesor con tus datos reales</div></div>
         </div>
       </div>
-
-      <div style={{ flex: 1, overflowY: "auto", padding: "0 18px" }}>
-        {msgs.map((m, i) => (
-          <div key={i} style={{ marginBottom: 10, display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", animation: "fadeIn 0.3s both" }}>
-            <div style={{ 
-              maxWidth: "84%", 
-              background: m.role === "user" ? C.teal : C.card2, 
-              color: m.role === "user" ? "#000" : C.text, 
-              borderRadius: m.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px", 
-              padding: "10px 14px", 
-              fontSize: 13, 
-              lineHeight: 1.6, 
-              whiteSpace: "pre-wrap", 
-              border: m.role === "assistant" ? `1px solid ${C.border}` : "none" 
-            }}>
+      <div style={{ flex:1, overflowY:"auto", padding:"0 18px" }}>
+        {msgs.map((m,i)=>(
+          <div key={i} style={{ marginBottom:10, display:"flex", justifyContent:m.role==="user"?"flex-end":"flex-start", animation:"fadeIn 0.3s both" }}>
+            <div style={{ maxWidth:"84%", background:m.role==="user"?C.teal:C.card2, color:m.role==="user"?"#000":C.text, borderRadius:m.role==="user"?"14px 14px 4px 14px":"14px 14px 14px 4px", padding:"10px 14px", fontSize:13, lineHeight:1.6, whiteSpace:"pre-wrap", border:m.role==="assistant"?`1px solid ${C.border}`:"none" }}>
               {m.content}
             </div>
           </div>
         ))}
-        {loading && <div style={{ display: "flex", gap: 4, padding: "10px 14px", background: C.card2, borderRadius: "14px 14px 14px 4px", width: 58, marginBottom: 10, border: `1px solid ${C.border}` }}>
-          {[0, 1, 2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: C.teal, animation: `bounce 1s ${i * 0.2}s infinite` }} />)}
+        {loading && <div style={{ display:"flex", gap:4, padding:"10px 14px", background:C.card2, borderRadius:"14px 14px 14px 4px", width:58, marginBottom:10, border:`1px solid ${C.border}` }}>
+          {[0,1,2].map(i=><div key={i} style={{ width:6, height:6, borderRadius:"50%", background:C.teal, animation:`bounce 1s ${i*0.2}s infinite` }}/>)}
         </div>}
-        <div ref={ref} />
+        <div ref={ref}/>
       </div>
-
-      <div style={{ padding: "8px 18px" }}>
-        <div style={{ display: "flex", gap: 6, marginBottom: 8, overflowX: "auto", paddingBottom: 2 }}>
-          {quick.map((q, i) => <button key={i} onClick={() => setInput(q)} style={{ ...S.btnSm, whiteSpace: "nowrap", fontSize: 10, padding: "5px 10px", borderRadius: 20, flexShrink: 0 }}>{q}</button>)}
+      <div style={{ padding:"8px 18px" }}>
+        <div style={{ display:"flex", gap:6, marginBottom:8, overflowX:"auto", paddingBottom:2 }}>
+          {quick.map((q,i)=><button key={i} onClick={()=>setInput(q)} style={{ ...S.btnSm, whiteSpace:"nowrap", fontSize:10, padding:"5px 10px", borderRadius:20, flexShrink:0 }}>{q}</button>)}
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Escribe aquí..." style={{ ...S.input, flex: 1 }} />
-          <button onClick={send} disabled={loading || !input.trim()} style={{ background: loading || !input.trim() ? C.dim : C.teal, color: loading || !input.trim() ? C.muted : "#000", border: "none", borderRadius: 10, padding: "10px 14px", fontWeight: 700, cursor: "pointer", fontSize: 16 }}>→</button>
+        <div style={{ display:"flex", gap:8 }}>
+          <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Pregúntale a tu asesor IA..." style={{ ...S.input, flex:1 }}/>
+          <button onClick={send} disabled={loading||!input.trim()} style={{ background:loading||!input.trim()?C.dim:C.teal, color:loading||!input.trim()?C.muted:"#000", border:"none", borderRadius:10, padding:"10px 14px", fontWeight:700, cursor:"pointer", fontSize:16 }}>→</button>
         </div>
       </div>
     </div>
   );
 }
+
 // ─── NAV ──────────────────────────────────────────────────────────────────────
 function BottomNav({ active, setActive }) {
   const tabs = [
@@ -712,7 +666,7 @@ function BottomNav({ active, setActive }) {
 function App() {
   const [data, setData] = useState(null);
   const [screen, setScreen] = useState("home");
-   if(!data) return (
+  if(!data) return (
     <div style={S.app}><div style={S.phone}><div style={S.screen}>
       <SetupWizard onFinish={d=>{ setData(d); setScreen("home"); }}/>
     </div></div></div>
@@ -721,12 +675,11 @@ function App() {
     <div style={S.app}>
       <div style={S.phone}>
         <div style={S.screen}>
-          {/* Aquí irán tus pantallas */}
           {screen==="home"    && <HomeScreen    data={data} onEdit={()=>setData(null)}/>}
           {screen==="bills"   && <BillsScreen   data={data} setData={setData}/>}
           {screen==="savings" && <SavingsScreen data={data} setData={setData}/>}
           {screen==="tips"    && <TipsScreen    data={data}/>}
-          {screen==="ai"      && <AIScreen      data={data}/>} 
+          {screen==="ai"      && <AIScreen      data={data}/>}
         </div>
         <BottomNav active={screen} setActive={setScreen}/>
       </div>
